@@ -29,7 +29,10 @@ services:
     volumes:
       - hdfs_data2:/hadoop/dfs/data
   minio:
-    image: quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z
+    build:
+      context: .
+      dockerfile: Dockerfile.minio
+    platform: linux/amd64
     container_name: local_s3_minio
     ports:
       - "127.0.0.1:9001:9000"
