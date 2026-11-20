@@ -1,0 +1,48 @@
+services:
+  namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    container_name: hdfs_namenode
+    ports:
+      - "127.0.0.1:9870:9870"
+      - "127.0.0.1:9000:9000"
+    environment:
+      CLUSTER_NAME: test-cluster
+    env_file: hadoop.env
+    volumes:
+      - hdfs_name:/hadoop/dfs/name
+  datanode1:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: hdfs_datanode1
+    depends_on: [namenode]
+    environment:
+      SERVICE_PRECONDITION: namenode:9870
+    env_file: hadoop.env
+    volumes:
+      - hdfs_data1:/hadoop/dfs/data
+  datanode2:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: hdfs_datanode2
+    depends_on: [namenode]
+    environment:
+      SERVICE_PRECONDITION: namenode:9870
+    env_file: hadoop.env
+    volumes:
+      - hdfs_data2:/hadoop/dfs/data
+  minio:
+    image: quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z
+    container_name: local_s3_minio
+    ports:
+      - "127.0.0.1:9001:9000"
+      - "127.0.0.1:9002:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadminpassword
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+
+volumes:
+  hdfs_name:
+  hdfs_data1:
+  hdfs_data2:
+  minio_data:
